@@ -1,0 +1,239 @@
+
+
+
+
+<!DOCTYPE html>
+<head>
+      <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Software developer." />
+  <meta name="author" content="" />
+
+  <meta name="robots" content="nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet"
+  /> -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+JP&family=Noto+Sans+Arabic&display=swap" rel="stylesheet">
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+  <link
+    rel="icon"
+    href="/assets/images/favicon.ico"
+    type="image/x-icon"
+  />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <script defer src="/assets/js/script.js"></script>
+
+    <title>Hussein Adi - The Algorithms and Limits Infinite Linear Search</title>
+</head>
+<body>
+    <div class="nav">
+  <div class="nav-inner">
+    
+    <!-- Language Dropdown Toggle (Left) -->
+    <button class="language-toggle" id="languageToggle" aria-label="Select language">
+      <i class="fas fa-globe"></i>
+      <div class="menu-icon-label">Language</div>
+    </button>
+
+    <a href="/">
+      <div id="site-date" class="site-date">
+        <!-- January 27, 2026 -->
+      </div>
+    </a>
+    
+    <!-- Burger Toggle (Right) -->
+    <button class="burger" id="burgerToggle" aria-label="Toggle menu">
+      <i class="fas fa-bars"></i>
+      <div class="menu-icon-label">Menu</div>
+    </button>
+
+  </div>
+
+  <!-- Language Dropdown Menu -->
+  <div class="language-menu" id="languageMenu">
+    <ul>
+      <li><a href="/">English</a></li>
+      <li><a href="/de">Deutsch</a></li>
+      <!-- <li><a href="/fr">Français</a></li> -->
+    </ul>
+  </div>
+</div>
+
+<!-- Fullscreen Main Navigation Menu -->
+<nav class="fullscreen-menu" id="mainMenu">
+  <ul id="mainMenuList">
+    <li><a href=/>Home</a></li>
+    <!-- <li><a href="/experience"></a></li> -->
+    <!-- <li><a href="/projects"></a></li> -->
+    <li>
+      <a href="/about">
+      About
+      </a>
+    </li>
+  </ul>
+</nav>
+    <section id="content">
+        <div id="vertical-content">
+
+			<div>
+				<h1 class="post-title"> The Algorithms and Limits Infinite Linear Search 
+					
+				</h1>
+			</div>
+          
+			<div class="post-content">
+			<p>Searching for a specific value among a set of unsorted values is quite easily solvable, even to those new to computer science: add the values to a well-defined data structure, sort, and execute a search algorithm. Collectively, this has a time complexity of <code class="language-plaintext highlighter-rouge">O(nlog(n))</code>. When the target value is unknown beforehand, the problem becomes more difficult.</p>
+
+<p>This type of searching is distinct from the classical sort-and-search problems, in that the value we seek is unknown, and therefore its position or relation to the space in which it is defined is likewise unknown. This class of problem is broadly known as Search-and-Rescue, and is somewhat related to distributing computing problems in terms of analysis. The rescue portion of these problems factor in the cost of returning to the starting point after a successful search, which is trivial; it is the searching algorithm that is the focus.</p>
+
+<h1 id="linear-1d-search">Linear (1D) Search</h1>
+
+<p>We may begin with a formal definition of the problem.</p>
+
+<p>A mobile agent <b>α</b> begins at the origin <code class="language-plaintext highlighter-rouge">0</code> of a line. The line is infinitely long in both the positive and negative directions. For simplicity and illustrative purposes, let the negative direction be referred to as the <i>left</i>, and the positive direction be referred to as the <i>right</i>. The agent α is capable of moving at a speed of <code class="language-plaintext highlighter-rouge">1</code>. An object <b><code class="language-plaintext highlighter-rouge">x</code></b> lies at some point along this line distance <b><code class="language-plaintext highlighter-rouge">d</code></b> away from the origin. <code class="language-plaintext highlighter-rouge">x</code> is strictly not at the origin is placed randomly. What algorithm should <code class="language-plaintext highlighter-rouge">α</code> follow to locate <code class="language-plaintext highlighter-rouge">x</code> and how efficient is it in comparison to an algorithm with perfect knowledge?
+<br /></p>
+
+<p><img src="/assets/images/posts/cs-dsa-I.png" alt="" /></p>
+
+<p><br />
+This is quite a straightforward question and only requires a bit of math and thinking, but I love it because accurately describing its efficiency involves the concepts of the <i>competitive ratio</i> and the <i>adversary</i>. I will define them briefly before continuing with the problem.</p>
+
+<p>The competitive ratio of an algorithm A’ is the ratio of the time or some other cost required by A’ to complete and the time or cost required by the optimum algorithm A with perfect knowledge. Naturally this ratio is either 1 or greater as it is logically not possible for an algorithm to perform better than the best-performing algorithm.</p>
+
+<p>The adversary is a hypothetical actor or environment that works against the algorithm such that it guarantees the worst case scenario. Just as Big-O notation refers to the worst-case time complexity, the adversary ensures an algorithm A’ spends the worst-case cost. The competitive ratio uses the adversary to refer to the worst-case ratio. The term adversary connotes an actual actor, but this is all hypothetical. The adversary concept simply means that when calculating the competitive ratio of A’, we analyze the worst case scenario as specifically designed to work against A’.</p>
+
+<p>Let’s begin by formulating A’ for the linear search problem, but with an advantage: A’ knows whether <code class="language-plaintext highlighter-rouge">x</code> lies to the left or the right of the origin. What should A’ be and what is the competitive ratio? A’ already knows which direction x lies in, so all A’ should logically be is</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> - travel in the direction of x at speed 1 until x is reached
+</code></pre></div></div>
+
+<p>Since α moves at speed 1, and travels <code class="language-plaintext highlighter-rouge">d</code> distance, we can say that that <code class="language-plaintext highlighter-rouge">α</code> has taken <code class="language-plaintext highlighter-rouge">d</code> time. This is also the same time taken as the optimal algorithm which knows both the direction and the distance <code class="language-plaintext highlighter-rouge">d</code> (although <code class="language-plaintext highlighter-rouge">d</code> is redundant given the direction). So, quite intuitively, if the direction of <code class="language-plaintext highlighter-rouge">x</code> from the origin is known, we can implement an algorithm with a competitive ratio of <code class="language-plaintext highlighter-rouge">d/d</code> which is 1.</p>
+
+<p>What about if the direction is not known, but <code class="language-plaintext highlighter-rouge">d</code> is known? In this case we simply pick a direction and travel for <code class="language-plaintext highlighter-rouge">d</code> distance. If we’re lucky, we’ll find <code class="language-plaintext highlighter-rouge">x</code> and terminate. If <code class="language-plaintext highlighter-rouge">x</code> is not found, then we change the direction and travel <code class="language-plaintext highlighter-rouge">2d</code>, at which point we find <code class="language-plaintext highlighter-rouge">x</code>. Our algorithm would be</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> - select a direction
+ - travel d distance in the given direction at speed 1
+ - if x is not found, change direction and travel 2d distance at speed 1
+</code></pre></div></div>
+
+<p>If we initially select the correct direction, we proceed directly to <code class="language-plaintext highlighter-rouge">x</code> and the time taken is as the previous case: simply <code class="language-plaintext highlighter-rouge">d</code>. But if our guess is incorrect, then α travels a distance of <code class="language-plaintext highlighter-rouge">3d</code>, comprising of <code class="language-plaintext highlighter-rouge">1d</code> in the initial direction, <code class="language-plaintext highlighter-rouge">1d</code> in the opposite direction to return to the origin, and another <code class="language-plaintext highlighter-rouge">1d</code> to reach <code class="language-plaintext highlighter-rouge">x</code> totalling 3d. Since <code class="language-plaintext highlighter-rouge">x</code> is placed either to the left or right at equal probability, this means half the time our algorithm guesses correctly and performs optimally costing <code class="language-plaintext highlighter-rouge">d</code>. The other half of the time, it guesses incorrectly costing <code class="language-plaintext highlighter-rouge">3d</code>. It follows that we may expect our algorithms cost to be <code class="language-plaintext highlighter-rouge">2d</code>, or twice that of the optimal algorithm…right?</p>
+
+<p>Maybe, but this goes against how we described our conditions for analysis. The adversary guarantees the worst case for our algorithm; one can almost describe it as first seeing the direction guess, followed by placing <code class="language-plaintext highlighter-rouge">x</code> in the opposite direction, such as to ensure the first guess is always incorrect. This of course means our cost is <code class="language-plaintext highlighter-rouge">3d</code> and the competitive ratio is 3.</p>
+
+<p>Our final case of single-agent linear search is when we do not know <code class="language-plaintext highlighter-rouge">d</code> or the direction of <code class="language-plaintext highlighter-rouge">x</code>. Our algorithm must again search in both directions. When should the mobile agent decide to search to the left or right?</p>
+
+<p>The agent will have to alternate between searching to the left and right in a specified pattern. We can divide the algorithm into rounds. Each round covers a larger distance than in the previous rounds.</p>
+
+<p>Suppose our agent begins at round 1. It first travels to the right a distance of 1. It then returns to the origin and travels to the left a distance of 1 before returning to the origin again. Every k-th round, this is repeated but for a distance of k. Can we compute competitive ratio of this algorithm? First, we must determine where the adversary will place <code class="language-plaintext highlighter-rouge">x</code>. Since our robot begins each round by traversing to the right, the adversary places <code class="language-plaintext highlighter-rouge">x</code> somewhere to the left. On round k, a distance of 4k is traversed, assuming that <code class="language-plaintext highlighter-rouge">x</code> is not found on that round. The adversary places this at the minimal value just beyond a value of <code class="language-plaintext highlighter-rouge">k</code> such that  α does not reach x on round k, but wastes time in round k + 1. For example, the agent places <code class="language-plaintext highlighter-rouge">x</code> at 9.01 (or some other infinitesmally small factor), such that on round 9 α barely misses finding <code class="language-plaintext highlighter-rouge">x</code> and instead finds <code class="language-plaintext highlighter-rouge">x</code> on round 10 (k + 1). The adversary does not place it the farthest distance possible, but rather the position that makes A’ the most inefficient compared to the optimal algorithm.</p>
+
+<p>Unfortunately, this algorithm is highly inefficient and we want to be able to compute hard limit on the competitive ratio. The agent spends excessive time traversing distances it has already covered.</p>
+
+<p>Let’s propose a different algorithm to address these two drawbacks. Our algorithm should increasingly cover more distance as it changes direction by and increasingly large factor; increasing it by 1, corresponding to the round number, is far too inefficient. We’ll change this to increase the distance exponentially by doubling it each round. The round number will act as our exponent. We begin at round index 0 and selecting a direction at random. We travel a distance of 2^r in that direction and return to the origin. Then we switch directions and set r = 2^r, repeating until x is found.</p>
+
+<p>Of course, the adversary will act similarly as in the previous algorithms. The adversary placed x such that our robot will barely miss it on round k, where it travels a distance of 2^k. It then returns to the origin and wastes another 2 * 2^(k + 1) distance tavelling in the other direction on the next round. On round k + 2 it then travels d distance and finds x.</p>
+
+<p>d of course is not known exactly. But we know its displacement from the origin to be between 2^k and 2^k + 3, since it is guaranteed to not be found on round k and guaranteed to be found on round k + 2. Deceptively similar to our previous algorithm, but it turns out to be very convenient. The total distance this travels is</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 2 * (2^0 + 2^1 + 2^2 ... 2^(k+1)) + d
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">d</code> is the distance travelled on round k + 2. The multiplication factor of 2 on the previous round is the distance to and from the origin. The terms 2^0 to 2^k can be simplified to 2^(k + 1) - 1, which means we can further simplify the equation to</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 2 * (2^(k+2) - 1) + d
+</code></pre></div></div>
+
+<p>This is roughly equivalent to <code class="language-plaintext highlighter-rouge">2^(k + 3) + d</code> as the constant term <code class="language-plaintext highlighter-rouge">-1</code> can be ignored at large values of k. We can separate k and rewrite this as <code class="language-plaintext highlighter-rouge">8 * 2^k + d</code>. We don’t know exactly how k is related to d, but as we stated before, we know 2^k is less than d. If we substitute 2^k for <code class="language-plaintext highlighter-rouge">d</code> to get <code class="language-plaintext highlighter-rouge">8 * d + d</code>, we simplify this to 9d, which is an upper limit because we substituted a larger value. Thanks to the adversary, d is likely barely larger than 2^k, so we may assume they are about equal.</p>
+
+<p>Our competitive ratio is 9d / d or 9. This is a hard limit! We now have an algorithm that we can guarantee will travel no more than 9 times the minimum distance to find x. This is in fact the best performance. Any other linear search algorithm in the same set up will perform at best with a competitive ratio of 9.</p>
+
+<p>And that completes our analysis of linear search for this problem setup! If the direction is known, there exists an algorithm with a competitive ratio of 1. If the direction is unkown but the distance is known, we can devise an algorithm with a competitive ratio of 3. And if no information is given, the best ‘offline’ algorithm has a competitive ratio of 9. There are of course different problem setups, including multi-robot linear search with differing communication methods, and it is further complicated by adding an evacuation step.</p>
+
+<h1 id="linear-search-script">Linear Search Script</h1>
+
+<p>Below is an implementation of this algorithm, which will allow us to verify its correctness in practice. This script mimics a line with a minimum, maximum, and origin value. The position for x is selected at random. The while loop then calculates the distance covered each round, along with the total distance, until the distance covered that round in the direction of x exceeds the displacement of x. This indicates x is found on that round. Dividing the total distance by the minimum distance indicates the efficiency of the algorithm for that position of x.</p>
+
+<p>By doubling the distance covered while alternating between directions, the algorithm is guaranteed to locate x after traversing a distance of at most 9 times the minimum distance.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="n">MAX</span> <span class="o">=</span> <span class="mf">1000000000000000000.0</span>
+<span class="n">MIN</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">ORIGIN</span> <span class="o">=</span> <span class="mi">500000000000000000</span>
+
+<span class="n">x_position</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">MIN</span><span class="p">,</span> <span class="n">MAX</span><span class="p">)</span>
+<span class="n">x_direction</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x_position</span> <span class="o">&gt;=</span> <span class="n">ORIGIN</span> <span class="k">else</span> <span class="mi">0</span>
+<span class="n">opt_dist</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x_position</span> <span class="o">-</span> <span class="n">ORIGIN</span><span class="p">)</span>
+<span class="n">direction</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">exponent</span> <span class="o">=</span> <span class="n">total_dist</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'X position at </span><span class="si">{</span><span class="n">x_position</span><span class="si">}</span><span class="s"> in direction </span><span class="si">{</span><span class="n">x_direction</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+
+<span class="k">while</span><span class="p">(</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">round_distance_covered</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">exponent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">exponent</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">direction</span> <span class="o">^=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="p">((</span><span class="n">round_distance_covered</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">opt_dist</span> <span class="ow">and</span> <span class="n">direction</span> <span class="o">==</span> <span class="n">x_direction</span><span class="p">):</span>
+        <span class="n">total_dist</span> <span class="o">+=</span> <span class="n">opt_dist</span>
+        <span class="k">break</span>
+
+    <span class="n">total_dist</span> <span class="o">+=</span> <span class="n">round_distance_covered</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">'X has been located.'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'Minimum distance: </span><span class="si">{</span><span class="n">opt_dist</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'Total distance: </span><span class="si">{</span><span class="n">total_dist</span><span class="si">}</span><span class="s"> and a min of </span><span class="si">{</span><span class="n">opt_dist</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'Ratio: </span><span class="si">{</span><span class="n">total_dist</span> <span class="o">/</span> <span class="n">opt_dist</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h1 id="related-works">Related Works</h1>
+
+<p>I wrote this post mostly off the top of my head, but I have decided to include two papers below for further reading, in case I would like to revisit this topic. The paper by Czyzowicz et. al. shows how the rescue (or more aptly named evacuation, since there are multiple searchers) phase adds more complexity to the design of such algorithms. I intend to eventually write a post on that topic, but not before I write about other distributed algorithms, since this is meant to serve as a gentle introduction.</p>
+
+<hr />
+<p>R. Baeza Yates, J. Culberson, and G. Rawlins. Searching in the plane.
+Information and Computation, 106(2):234-252, 1993.</p>
+
+<p>J. Czyzowicz, E. Kranakis, D. Krizanc, L. Narayanan, J. Opatrny,
+Search on a Line with Faulty Robots. In Principles of Distributed
+Computing (PODC) 2016.</p>
+
+			</div>
+        </div>
+    </section>
+	
+	<!-- FOOTER BEGIN -->
+<div>
+  <div class="hline-grey"></div>
+  <div class="icon-container">
+    <a href="https://github.com/ehrenamt" aria-label="GitHub">
+      <i class="fab fa-github icon"></i>
+    </a>
+    <a href="mailto:applications.making780@passinbox.com" aria-label="Email">
+      <i class="fas fa-envelope icon"></i>
+    </a>
+    <a href="https://www.linkedin.com/in/husseinca/" aria-label="LinkedIn">
+      <i class="fab fa-linkedin icon"></i>
+    </a>
+  </div>
+
+  <p style="font-size: 11px; padding: 10px 0 15px 0; text-align: center;">Copyright &copy; 2025 - 2026 Hussein Adi | <a href="/copyright"><span class="green-link-text">License</span></a></p>
+</div>
+<!-- FOOTER END -->
+
+    
+</body>
+</html>
