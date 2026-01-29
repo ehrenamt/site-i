@@ -1,0 +1,169 @@
+
+
+
+
+<!DOCTYPE html>
+<head>
+      <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Software developer." />
+  <meta name="author" content="" />
+
+  <meta name="robots" content="nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet"
+  /> -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+JP&family=Noto+Sans+Arabic&display=swap" rel="stylesheet">
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+  <link
+    rel="icon"
+    href="/assets/images/favicon.ico"
+    type="image/x-icon"
+  />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <script defer src="/assets/js/script.js"></script>
+
+    <title>Hussein Adi - Preliminary Thoughts on Data Complexity</title>
+</head>
+<body>
+    <div class="nav">
+  <div class="nav-inner">
+    
+    <!-- Language Dropdown Toggle (Left) -->
+    <button class="language-toggle" id="languageToggle" aria-label="Select language">
+      <i class="fas fa-globe"></i>
+      <div class="menu-icon-label">Language</div>
+    </button>
+
+    <a href="/">
+      <div id="site-date" class="site-date">
+        <!-- January 29, 2026 -->
+      </div>
+    </a>
+    
+    <!-- Burger Toggle (Right) -->
+    <button class="burger" id="burgerToggle" aria-label="Toggle menu">
+      <i class="fas fa-bars"></i>
+      <div class="menu-icon-label">Menu</div>
+    </button>
+
+  </div>
+
+  <!-- Language Dropdown Menu -->
+  <div class="language-menu" id="languageMenu">
+    <ul>
+      <li><a href="/">English</a></li>
+      <li><a href="/de">Deutsch</a></li>
+      <!-- <li><a href="/fr">Français</a></li> -->
+    </ul>
+  </div>
+</div>
+
+<!-- Fullscreen Main Navigation Menu -->
+<nav class="fullscreen-menu" id="mainMenu">
+  <ul id="mainMenuList">
+    <li><a href=/>Home</a></li>
+    <!-- <li><a href="/experience"></a></li> -->
+    <!-- <li><a href="/projects"></a></li> -->
+    <li>
+      <a href="/about">
+      About
+      </a>
+    </li>
+  </ul>
+</nav>
+    <section id="content">
+        <div id="vertical-content">
+
+			<div>
+				<h1 class="post-title"> Preliminary Thoughts on Data Complexity 
+					
+				</h1>
+			</div>
+          
+			<div class="post-content">
+			<p>Since I first learned about neural networks, what struck me was whether there exists a sort of cutoff between the efficacy of using a full-fledged NN over classical machine learning methods and vice-versa. One might argue that it depends on how the data is used; an LLM may not be needed to analyze whether a text has positive, negative, or neutral sentiment. Perhaps clustering would be sufficient for this task. But is there an equation or function that determines, even loosely, whether a certain dataset requires a neural network for accurate analysis, or whether simpler machine learning methods would suffice for little to no loss in accuracy?</p>
+
+<p>Then again, the idea of knowing the data complexity before feeding it into an analysis pipeline seems counter-intuitive. An analysis pipeline should take care of reducing the unnecessary data and its complexity using dimension reduction, principal component analysis, and maybe scree plots. Parts of the data that are unneeded will be ignored and excluded downstream in a well-engineered pipeline. It is not complicated to program a NN for a specific task, so there may not be an incentive to strictly know beforehand whether a dataset or class of data is too ‘simple’ to be fed into an LLM, or too complex to be categorized by clustering or nearest-neighbors. Therefore, one may intuitively say the type of model for data analysis depends on the purpose of the analysis, regardless of the presumed complexity of the data.</p>
+
+<p>But what if we removed the method of analysis from our consideration and instead concern ourselves solely with the inherent complexity of the data itself. How big and complex of a neural network would we need in order to achieve 99% accuracy? What relations within the dataset may serve as an indicator of the size of the NN to achieve 99% accuracy?</p>
+
+<p>Consider some data on road vehicle collisions. Each data entry consists of accident information - the speed of the vehicle involved and its mass, the type of accident, the number of occupants in the vehicle, whether they were wearing seatbelts, and similar relevant data, totaling 40 columns or attributes per row, excluding metadata such as incident ID the date it was loaded into the database. The goal of our analysis is to predict whether the accident results in severe injuries or not. What about this data makes the data complex? Or alternatively, what patterns in this data makes it simple?</p>
+
+<p>We first rule out the volume of data, namely the number of columns and rows, as a standalone factor in data complexity. Ignoring the realism involved, what if the sole determinant of the presence of severe injuries is whether both drivers were wearing their seatbelts? Only a <code class="language-plaintext highlighter-rouge">wearing_seatbelt</code> attribute would be relevant. The remaining 39 columns can be fully ignored and the entire dataset can described as, “If both occupants were wearing their seatbelt at the time of the incident, then there were no serious injuries.” Both columns and rows may add data, <em>but contribute no new information</em>.</p>
+
+<p>(It follows that the speed in which data is added is also irrelevant to the data’s complexity, if no new information is added. New data may or may not change the relation type, but as a standalone factor, it means nothing. Before writing this I brainstormed for a few minutes and did some searches, where I came across the concepts of volume, velocity, and veracity, but I heavily disagree with these as measures of complexity inherent to the data. These instead would indicate the level of complexity needed for the pipeline to support the data within business constraints, which is completely removed from data complexity.)</p>
+
+<p>Let’s make this slightly more realistic. We change the predictor of injuries from seatbelts only to the speed in combination with the seatbelt attribute. We define the rules as follows:</p>
+
+<p>• Collisions below 30 km/h do not result in serious injuries</p>
+
+<p>• Collisions between 30 km/h and 60 km/h result in serious injuries if both drivers are not wearing seatbelts</p>
+
+<p>• Collisions above 60 km/h result in serious injuries regardless</p>
+
+<p>We cannot use our previous data description. Instead of one column to describe the data, the speed column is also required to describe the data. But this is not a simple linear relationship. The data is described as a stepwise speed function in combination with a binary seatbelt function. So this brings into question the relationship between pertinent data attributes. How complex are the functions relating data attributes with each other?</p>
+
+<p>What if the functions relating two or more attributes is directly proportional? Then every one of these attributes could be expressed in terms of each other. One could select a single core attribute to which the other linearly-dependent attributes are expressed. In effect there is only one principal attribute that describes the remaining related attributes. But other attributes may be related to each other, and if linear, this means multiple core attributes.</p>
+
+<p>From this, perhaps the number of core attributes is a possible indication of the complexity of data.</p>
+
+<p>What if the relationships between variables are not directly directly proportional, but polynomial? For example, the relationship between comfort and temperature is polynomial. Beginning from extreme cold, increasing temperature increases comfort, until the temperature is too high and comfort decreases. We can say certain polynomial relationships such as temperature and comfort are naturally occurring, but this still makes them more complex than linear or directly proportional relations. Based on this, perhaps the degree of the polynomial relating two or more data attributes is an indication of the data complexity.</p>
+
+<p>Beyond linear and polynomial functions, we also must consider non-linear and non-polynomial relations, namely, relations within the data that cannot be differentiated. NNs are built exactly for capturing such relations, which is why they are so potent. This potentially indicates the highest complexity of all intra-data relations.</p>
+
+<p>Based on these thoughts, maybe we could represent data complexity as a score based on 1) the number of principal components, namely, the number of attributes which result in variations in other components or attributes which have high variations without being related to any other attributes, and 2) the degree of complexity between attributes.</p>
+
+<p>To conclude, this reminds me of a question asked by my professor. Towards the end of a discussion the message complexity of distributed algorithms, he said, “I am going to give you a series of numbers.” He then drew a 1, followed by  fifteen zeros, and then another 1. “Is this complex?”</p>
+
+<p>A student said no, as each number could only be 0 or 1.</p>
+
+<p>“Right, but what about this?” My professor then wrote 17 digits of 1s and 0s in a random permutation. “This is also just zeros and ones. But is this data more complex than the previous data?”</p>
+
+<p>Some said yes, others said no. I said, “I would say no, because if we try to compress both of these sets of numbers, you could easily summarize the first set, but not the second.”</p>
+
+<p>“Exactly,” replied my professor. “I can describe the first set as a 1, followed by fifteen zeros, and then another 1. For the second set, I describe it as two 1s, followed by a 1, then a 1, then three 0s, then two ones, and so on. Can any of you remember that? Or how about this: if I showed both of you each set for 1 second and then they disappeared, how well can you remember them?”</p>
+
+<p>These are all paraphrased and my professor quickly brushed that example aside because he wanted to continue with the lesson. But this example brings up the idea of describing or summarizing data. This is effectively inherent in neural networks. In reality it is impossible to collect every minute piece of relevant data, as often as possible, and find exact measures: mean, median, modes. Tracking every cluster, every subset of the data. And so neural networks solve this problem by approximating and guessing. (Notably, though, neural networks due have the ability to “artificially augment” the data by having layers with more nodes than data attributes in the original data, but in a predictive / classification model, all attributes are eventually simplified.) NNs do not describe the data perfectly. They instead avoid the massive complexity that comes with massive datasets via heuristics; they simplify the “description” of the data, in effect, by ignoring parts to describe!</p>
+
+<p>I would like to revisit this topic, but this is all for now before I work to formalize this a little. When I do revisit this, I will be writing a script to attempt to actually model data complexity, and feed the data to a NN to see if a complexity score predicts the accuracy of the neural network.</p>
+
+			</div>
+        </div>
+    </section>
+	
+	<!-- FOOTER BEGIN -->
+<div>
+  <div class="hline-grey"></div>
+  <div class="icon-container">
+    <a href="https://github.com/ehrenamt" aria-label="GitHub">
+      <i class="fab fa-github icon"></i>
+    </a>
+    <a href="mailto:applications.making780@passinbox.com" aria-label="Email">
+      <i class="fas fa-envelope icon"></i>
+    </a>
+    <a href="https://www.linkedin.com/in/husseinca/" aria-label="LinkedIn">
+      <i class="fab fa-linkedin icon"></i>
+    </a>
+  </div>
+
+  <p style="font-size: 11px; padding: 10px 0 15px 0; text-align: center;">Copyright &copy; 2025 - 2026 Hussein Adi | <a href="/copyright"><span class="green-link-text">License</span></a></p>
+</div>
+<!-- FOOTER END -->
+
+    
+</body>
+</html>
