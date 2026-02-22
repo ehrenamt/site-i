@@ -1,0 +1,145 @@
+
+
+
+
+<!DOCTYPE html>
+<head>
+      <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A technical blog focusing mostly on computer science, engineering, and urban spaces." />
+  <meta name="author" content="" />
+
+  <meta name="robots" content="nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+JP&family=Noto+Sans+Arabic&display=swap" rel="stylesheet">
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+  <link
+    rel="icon"
+    href="/assets/images/favicon.png"
+    type="image/x-icon"
+  />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <script defer src="/assets/js/script.js"></script>
+
+    <title>Is it possible get accurate GPS readings using only an SDR receiver?</title>
+</head>
+<body>
+    <div class="nav">
+  <div class="nav-inner">
+    
+    <!-- Language Dropdown Toggle (Left) -->
+    <button class="language-toggle" id="languageToggle" aria-label="Select language">
+      <i class="fas fa-globe"></i>
+      <div class="menu-icon-label">Language</div>
+    </button>
+
+    <a href="/">
+      <div id="site-date" class="site-date">
+        <!-- February 22, 2026 -->
+      </div>
+    </a>
+    
+    <!-- Burger Toggle (Right) -->
+    <button class="burger" id="burgerToggle" aria-label="Toggle menu">
+      <i class="fas fa-bars"></i>
+      <div class="menu-icon-label">Menu</div>
+    </button>
+
+  </div>
+
+  <!-- Language Dropdown Menu -->
+  <div class="language-menu" id="languageMenu">
+    <ul>
+      <li><a href="/">English</a></li>
+      <li><a href="/de">Deutsch</a></li>
+      <!-- <li><a href="/fr">Français</a></li> -->
+    </ul>
+  </div>
+</div>
+
+<!-- Fullscreen Main Navigation Menu -->
+<nav class="fullscreen-menu" id="mainMenu">
+  <ul id="mainMenuList">
+    <li><a href=/>Home</a></li>
+    <!-- <li><a href="/experience"></a></li> -->
+    <!-- <li><a href="/projects"></a></li> -->
+    <li>
+      <a href="/about">
+      About
+      </a>
+    </li>
+  </ul>
+</nav>
+    <section id="content">
+        <div id="vertical-content">
+
+			<div>
+				<h1 class="post-title"> Is it possible get accurate GPS readings using only an SDR receiver? 
+					
+				</h1>
+			</div>
+          
+			<div class="post-content">
+			<p>The answer is no, not without a transmitter. Luckily, there are no shortage of transmitters flying all around that can help us, using a format and frequency that we can capture with a simple SDR receiver.</p>
+
+<p>The idea for this is very trivial, using the same steps as the GPS receiver on a phone. Your phone itself does not know its own location, not from its assigned IP address or via other means. Instead, it receives signals from at least three satellites in GNSS constellations. These GNSS satellite signals usually contain the satellite’s position or orbit information along with a precise timestamp. This allows a GPS receiver to compute its distance <em>d</em> from the satellite, and the GPS receiver lies somewhere on the circle with a radius of <em>d</em> centered on the satellite’s position at the provided timestamp. Receiving signals from three satellites will result in three circles which overlap at exactly one point, revealing the GPS receiver’s position.</p>
+
+<p>With an SDR receiver, we can actually (conceptually) design and build our own positioning system by mimicking a GPS receiver. We will use the SDR receive to receive and decode information from stations which broadcast positioning information. But with a basic SDR receiver and antenna, satellite signals might fall outside of our frequency range. What specific stations can we listen to that meet the requirements of positioning and time?</p>
+
+<h1 id="automatic-dependent-surveillance-broadcast-ads-b">Automatic Dependent Surveillance-Broadcast (ADS-B)</h1>
+
+<p><br />
+<img src="\assets\images\posts\avia-gps-coordinates-from-I\cseries.jpg" alt="An image of a Bombarder C-Series aircraft. Image obtained from Wikimedia Commons." /></p>
+<center style="font-size: 0.75rem;"><i>An image of a Bombarder C-Series aircraft. Image obtained from Wikimedia Commons.</i></center>
+<p><br /></p>
+
+<p>Our receiver can pick up some signals in the aeronautical band. One of such signals are Automatic Dependent Surveillance-Broadcast or ADS-B signals. We are specifically interested in ADS-B Out signals. These signals are data frames automatically broadcast by aircraft, containing aircraft identifiers, some metadata along with its heading, speed, and additional information. For our system, this is all we need: speed, heading, and GNSS coordinates. <span class=".green-link-text"><a href="https://mode-s.org/1090mhz/">Mode-s.org/1090mhz/</a></span> has an excellent guide that explains the data format of ADS-B frames. What is relevant to know is that most modern aircraft are fitted with these ADS-B receivers. As such we can apply this positioning method if we are close to a large metropolitan area or near frequently used NAVAIDs. Modern aircraft provide us with coverage.</p>
+
+<p>So we use our SDR receiver and tune it to 1090MHz to receive ADS-B frames from nearby aircraft. These frames may contain different information. The ADS-B protocol ensures that the crucial information we need for this, namely aircraft position, speed, and heading, are broadcast at specified intervals as shown in the table below (sourced from mode-s.org/1090mhz/).</p>
+
+<p><img src="\assets\images\posts\avia-gps-coordinates-from-I\adsb-table.png" alt="A table of ADS-B transmission rates, obtained from mode-s.org" /></p>
+
+<p>The fixed rate of these transmissions is crucial, as I will explain in a moment. It is not enough that the ADS-B is sent frequently, but also regularly.</p>
+
+<p>Now, when we use our SDR receiver and examine some ADS-B frames, we see the information of a few aircraft in our general area. How does this help us determine our position? We can begin by using some simple triangulation. Assuming we have at least three aircraft, we may select the three “outermost” aircraft, i.e. the three aircraft that construct a triangle containing all other aircraft either along the edges or within the interior of the triangle, and select the centre of this triangle as our preliminary guess. Aside from this being a wildly inaccurate guess, there is also no guarantee that you and your receiver lie within the triangle formed by the selected aircraft. There could be, for example, numerous aircraft to the east of the SDR receiver that are transmitting ADSB signals, but no aircraft to the west, and as such this preliminary guess will be highly inaccurate.</p>
+
+<p>What can we compute in order to find an exact position? From the table above, we know that aircraft equipped with ADS-B transmit their airborne position at a rate of 2 Hz, or once every 0.5 seconds. If the aircraft remains at a fixed distance from the SDR receiver (flying in an arc, or hovering), then after each reception of an airborne position message, we can expect the next airborne position message to arrive exactly 0.5 seconds + the speed of light takes to cover the distance between aircraft and the receiver later.</p>
+
+<p>However, if the aircraft is approaching the receiver, the next message will arrive in a shorter interval, as the distance has decreased. Similarly, if the aircraft is flying away from the receiver, the subsequent messages will arrive at increasingly larger intervals. From a single aircraft, this alone would give us two possible points to geo-locate our receiver. All that is needed is for another aircraft to corroborate one of the two locations. (There is an edge case: two flights flying directly opposite one another will compute the same two coordinates, and would necessitate a third aircraft on a distinct flightpath.)</p>
+
+<p>Conceptually, this is possible. I intended to build a working solution, but Python does not recognize the drivers I need to use the SDR, although it seems to work for C++ SDR applications. I’ll get around to building a proof-of-concept once I figure out the driver issue. I suspect the main difficulty will be obtaining an <em>accurate</em> coordinate. If the aircraft are close enough for the SDR receiver to capture their broadcasts, then they may be, in aboslute terms, close enough to the receiver that the microsecond difference in transmission intervals may not show up…and although the system clock can likely measure these differences, I have yet to find out whether my receiver can.</p>
+
+			</div>
+        </div>
+    </section>
+	
+	<!-- FOOTER BEGIN -->
+<div>
+  <div class="hline-grey"></div>
+  <div class="icon-container">
+    <a href="https://github.com/ehrenamt" aria-label="GitHub">
+      <i class="fab fa-github icon"></i>
+    </a>
+    <a href="mailto:applications.making780@passinbox.com" aria-label="Email">
+      <i class="fas fa-envelope icon"></i>
+    </a>
+    <a href="https://www.linkedin.com/in/husseinca/" aria-label="LinkedIn">
+      <i class="fab fa-linkedin icon"></i>
+    </a>
+  </div>
+
+  <p style="font-size: 11px; padding: 10px 0 15px 0; text-align: center;">Copyright &copy; 2025 - 2026 Hussein Adi | <a href="/copyright"><span class="green-link-text">License</span></a></p>
+</div>
+<!-- FOOTER END -->
+
+    
+</body>
+</html>

@@ -6,17 +6,10 @@
 <head>
       <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Software developer." />
+  <meta name="description" content="A technical blog focusing mostly on computer science, engineering, and urban spaces." />
   <meta name="author" content="" />
 
   <meta name="robots" content="nofollow" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- <link
-    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-    rel="stylesheet"
-  /> -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,13 +23,13 @@
 
   <link
     rel="icon"
-    href="/assets/images/favicon.ico"
+    href="/assets/images/favicon.png"
     type="image/x-icon"
   />
   <link rel="stylesheet" href="/assets/css/main.css" />
   <script defer src="/assets/js/script.js"></script>
 
-    <title>Hussein Adi - Preliminary Thoughts on Data Complexity</title>
+    <title>Preliminary Thoughts on Data Complexity</title>
 </head>
 <body>
     <div class="nav">
@@ -50,7 +43,7 @@
 
     <a href="/">
       <div id="site-date" class="site-date">
-        <!-- January 29, 2026 -->
+        <!-- February 22, 2026 -->
       </div>
     </a>
     
@@ -101,11 +94,11 @@
 
 <p>But what if we removed the method of analysis from our consideration and instead concern ourselves solely with the inherent complexity of the data itself. How big and complex of a neural network would we need in order to achieve 99% accuracy? What relations within the dataset may serve as an indicator of the size of the NN to achieve 99% accuracy?</p>
 
-<p>Consider some data on road vehicle collisions. Each data entry consists of accident information - the speed of the vehicle involved and its mass, the type of accident, the number of occupants in the vehicle, whether they were wearing seatbelts, and similar relevant data, totaling 40 columns or attributes per row, excluding metadata such as incident ID the date it was loaded into the database. The goal of our analysis is to predict whether the accident results in severe injuries or not. What about this data makes the data complex? Or alternatively, what patterns in this data makes it simple?</p>
+<p>Consider some data on road vehicle collisions. Each data entry has information on a vehicle involved in a road collision - the speed of the vehicle involved and its mass, the type of accident, the age of the driver, whether they were wearing a seatbelt, and similar relevant data, totaling 40 columns or attributes per row. The goal of our analysis is to predict whether the accident results in severe injuries or not. What about this data makes the data complex? Or alternatively, what patterns in this data makes it simple?</p>
 
 <p>We first rule out the volume of data, namely the number of columns and rows, as a standalone factor in data complexity. Ignoring the realism involved, what if the sole determinant of the presence of severe injuries is whether both drivers were wearing their seatbelts? Only a <code class="language-plaintext highlighter-rouge">wearing_seatbelt</code> attribute would be relevant. The remaining 39 columns can be fully ignored and the entire dataset can described as, “If both occupants were wearing their seatbelt at the time of the incident, then there were no serious injuries.” Both columns and rows may add data, <em>but contribute no new information</em>.</p>
 
-<p>(It follows that the speed in which data is added is also irrelevant to the data’s complexity, if no new information is added. New data may or may not change the relation type, but as a standalone factor, it means nothing. Before writing this I brainstormed for a few minutes and did some searches, where I came across the concepts of volume, velocity, and veracity, but I heavily disagree with these as measures of complexity inherent to the data. These instead would indicate the level of complexity needed for the pipeline to support the data within business constraints, which is completely removed from data complexity.)</p>
+<p>(It follows that the speed in which data is added is also irrelevant to the data’s complexity, if no new information is added. New data may or may not change the relation type, but as a standalone factor, it means nothing. I searched online for measures of data complexity for a few minutes before writing this post. The top search results only returned explanations of the volume, velocity, and veracity of data. I argue these do not qualify as measures of complexity inherent to the data. These instead would indicate the level of complexity needed for the pipeline to support the data within business constraints, which is completely removed from data complexity.)</p>
 
 <p>Let’s make this slightly more realistic. We change the predictor of injuries from seatbelts only to the speed in combination with the seatbelt attribute. We define the rules as follows:</p>
 
